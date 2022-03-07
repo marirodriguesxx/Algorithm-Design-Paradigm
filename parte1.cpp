@@ -3,16 +3,24 @@
 #include <vector>
 #include <fstream>
 #include <utility>
+#include<cmath>
 
 using namespace std;
 
-void troca(int vetor[], int i, int j){
+double distance_between_two_points(pair<int,int> a, pair<int,int> b){
+    int x_axis = (b.first - a.first)*(b.first - a.first);
+    int y_axis = (b.second - a.second)*(b.second - a.second);
+    double resp = sqrt(x_axis+y_axis);
+    return resp;
+}
+
+void swap(int vetor[], int i, int j){
 	int aux = vetor[i];
 	vetor[i] = vetor[j];
 	vetor[j] = aux;
 }
 
-void permuta(int vetor[], int inf, int sup){
+void exchange(int vetor[], int inf, int sup){
 	if(inf == sup){
 		for(int i = 0; i <= sup; i++)
 			printf("%d ", vetor[i]);
@@ -20,9 +28,9 @@ void permuta(int vetor[], int inf, int sup){
 	}
 	else{
 		for(int i = inf; i <= sup; i++){
-			troca(vetor, inf, i);
-			permuta(vetor, inf + 1, sup);
-			troca(vetor, inf, i); // backtracking
+			swap(vetor, inf, i);
+			exchange(vetor, inf + 1, sup);
+			swap(vetor, inf, i); // backtracking
 		}
 	}
 }
@@ -45,13 +53,12 @@ int main(int argc, char** argv){
         points.push_back(make_pair(aux[i],aux[i+1]));
     }
 
-    //line for debug
-    cout<<" ponits \n";
-    for(int i=0; i<points.size(); i++){
-        cout<<points[i].first <<" "<<points[i].second<<"\n";
-    }
-
-    // TODO : distância dos pontos
+    //lines for debug
+    // cout<<" ponits \n";
+    // for(int i=0; i<points.size(); i++){
+    //     cout<<points[i].first <<" "<<points[i].second<<"\n";
+    // }
+    //    cout<< distance_between_two_points(make_pair(2,-6),make_pair(7,3))<<endl;
 
     //TODO: organizar permutação
 	//int v[n+1];
@@ -60,7 +67,7 @@ int main(int argc, char** argv){
     // }
 	// int tam_v = sizeof(v) / sizeof(int);
 
-	// permuta(v, 0, tam_v - 1);
+	// exchange(v, 0, tam_v - 1);
 
     return 0;
 }
