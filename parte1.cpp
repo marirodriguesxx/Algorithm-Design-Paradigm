@@ -51,7 +51,7 @@ int main(int argc, char** argv){
         cout<<points[i].first <<" "<<points[i].second<<"\n";
     }
 
-    // TODO : distância dos pontos
+    // TODO : distância dos pontos!
 
     //TODO: organizar permutação
 	//int v[n+1];
