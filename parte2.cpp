@@ -44,6 +44,17 @@ void fill_in_subsets(vector<pair<int, int>> &points, vector<pair<int, int>> &S1,
     }
 }
 
+void fill_in_subset(vector<pair<int, int>> points, vector<pair<int, int>> &S1, pair<int, int> pa, pair<int, int> pb){
+    for( int i = 0 ; i < points.size()  ; i++ )
+    {
+        int verify_subset = is_on_left( pa, pb, points[i] );
+        if( verify_subset > 0 )
+        {
+            S1.push_back( points[i] );
+        }
+    }
+}
+
 void get_hamiltonian(vector<pair<int, int>> &points, pair<int, int> &pa, pair<int, int> &pb, vector<int> &e1, vector<int> &e2){
     for( int i = 1 ; i < points.size() - 1 ; i++ )
     {
@@ -57,8 +68,8 @@ void get_hamiltonian(vector<pair<int, int>> &points, pair<int, int> &pa, pair<in
             e2.push_back( i+1 );
         }
     }
-    cout<<"e1 size: "<<e1.size()<<endl;
-    cout<<"e2 size: "<<e2.size()<<endl;
+    // cout<<"e1 size: "<<e1.size()<<endl;
+    // cout<<"e2 size: "<<e2.size()<<endl;
 
     hamiltonian.push_back(1);
     for(int i=0;i<e1.size();i++){
@@ -79,9 +90,10 @@ double distance_point_to_line(int dx, int dy, int additive_constant, pair<int,in
     return distance;
 }
 
-void convex_polygon(int dx, int dy, int additive_constant, vector<pair<int,int>> subset, vector<pair<int, int>> & convex_hull,  pair<int,int> pa, pair<int,int> pb ){
+void convex_polygon(int &dx, int &dy, double &additive_constant, vector<pair<int,int>> subset, vector<pair<int, int>> & convex_hull,  pair<int,int> pa, pair<int,int> pb ){
     if(subset.size() == 0)
     {
+        cout<<"aqui\n";
         return;
     }
     else{
@@ -96,23 +108,27 @@ void convex_polygon(int dx, int dy, int additive_constant, vector<pair<int,int>>
             }
         }
         convex_hull.push_back(p_max);
+        cout<<"p_max : "<<"("<<p_max.first<<","<<p_max.second<<  ")\n";
 
         vector<pair<int, int>> S11;
         vector<pair<int, int>> S22;
 
-        fill_in_subsets(subset,S11, S22, pa, p_max);
+        fill_in_subset(subset,S11, pa, p_max);
+        fill_in_subset(subset,S22, p_max, pb);
         //lines for debug
-            // cout<<"S11: ";
-            // for(int i=0; i<S11.size(); i++)
-            //     cout<<"("<<S11[i].first<<","<<S11[i].second<<  ") ";
-            // cout<<endl;
-            // cout<<"S22: ";
-            // for(int i=0; i<S22.size(); i++)
-            //     cout<<"("<<S22[i].first<<","<<S22[i].second<<") ";
-            // cout<<endl;
+            cout<<"S11: ";
+            for(int i=0; i<S11.size(); i++)
+                cout<<"("<<S11[i].first<<","<<S11[i].second<<  ") ";
+            cout<<endl;
+            cout<<"S22: ";
+            for(int i=0; i<S22.size(); i++)
+                cout<<"("<<S22[i].first<<","<<S22[i].second<<") ";
+            cout<<endl;
 
+        linear_equation( pa, p_max, dx, dy, additive_constant );
         convex_polygon(dx , dy , additive_constant , S11, convex_hull, pa, p_max);
-        convex_polygon(dx , dy , additive_constant , S22, convex_hull, pb, p_max);
+        linear_equation( p_max, pb, dx, dy, additive_constant );
+        convex_polygon(dx , dy , additive_constant , S22, convex_hull, p_max, pb);
         // cout << "point ("<<p_max.first<<","<<p_max.second<<") have max distance "<<distance_max <<endl;
     }
 }
@@ -123,6 +139,7 @@ void quick( vector<pair<int, int>> & points, vector<pair<int, int>> & convex_hul
     // -- Get first and last point -- //
     pair<int,int> pa = points[ 0 ];
     pair<int,int> pb = points[ points.size() - 1 ];    
+    cout<<"pa: "<<"("<<pa.first<<","<<pa.second<<  ") "<<"- pb: "<<"("<<pb.first<<","<<pb.second<<  ")\n ";
     convex_hull.push_back(pa);  //these points are part of the convex hull !
     convex_hull.push_back(pb);
 
@@ -141,20 +158,20 @@ void quick( vector<pair<int, int>> & points, vector<pair<int, int>> & convex_hul
     // -- we look into all points, excep the first and the last point (pa and pb)     
     fill_in_subsets(points,S1, S2, pa, pb);
     get_hamiltonian(points,pa,pb,e1,e2);
-    cout<<"s1 size: "<<S1.size()<<endl;
-    cout<<"s2 size: "<<S2.size()<<endl;
+    // cout<<"s1 size: "<<S1.size()<<endl;
+    // cout<<"s2 size: "<<S2.size()<<endl;
         
     convex_polygon(dx , dy , additive_constant , S1, convex_hull, pa, pb);
     convex_polygon(dx , dy , additive_constant , S2, convex_hull, pa, pb);
     //lines for debug
-            cout<<"S1: ";
-            for(int i=0; i<S1.size(); i++)
-                cout<<"("<<S1[i].first<<","<<S1[i].second<<  ") ";
-            cout<<endl;
-            cout<<"S2: ";
-            for(int i=0; i<S2.size(); i++)
-                cout<<"("<<S2[i].first<<","<<S2[i].second<<") ";
-            cout<<endl;
+            // cout<<"S1: ";
+            // for(int i=0; i<S1.size(); i++)
+            //     cout<<"("<<S1[i].first<<","<<S1[i].second<<  ") ";
+            // cout<<endl;
+            // cout<<"S2: ";
+            // for(int i=0; i<S2.size(); i++)
+            //     cout<<"("<<S2[i].first<<","<<S2[i].second<<") ";
+            // cout<<endl;
     }
 
 }
@@ -188,11 +205,10 @@ int main( int argc, char** argv )
     // lines for debug
             cout<<" points \n";
             for(int i=0; i<points.size(); i++){
-                cout<<"("<<points[i].first<<","<<points[i].second<<") ";
+                cout<<"("<<points[i].first<<","<<points[i].second<<")\n";
 
             }
-            cout<<endl;
-    cout<<"total points = "<<points.size()<<endl;
+    // cout<<"total points = "<<points.size()<<endl;
 
     quick( points , convex_hull );
 
