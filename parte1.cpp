@@ -29,14 +29,15 @@ void swap_position(int vetor[], int i, int j){
 
 double total_distance(vector<int> hamiltonian, vector<pair<int,int>> points){
     double total = 0;
-    for(int i=0; i<hamiltonian.size();i++){
+    for(int i=0; i<hamiltonian.size()-1;i++){
         double distance = distance_between_two_points(points[hamiltonian[i]-1], points[hamiltonian[i+1]-1]);
-        //lines for debug
-            // cout<<"distance between "<<points[hamiltonian[i]-1].first<<","<<points[hamiltonian[i]-1].second
-            // <<" and "<<points[hamiltonian[i+1]-1].first<<","<<points[hamiltonian[i+1]-1].second<<"="<< distance<<endl;
+        // //lines for debug
+        //     cout<<"distance between "<<points[hamiltonian[i]-1].first<<","<<points[hamiltonian[i]-1].second
+        //     <<" and "<<points[hamiltonian[i+1]-1].first<<","<<points[hamiltonian[i+1]-1].second<<"="<< distance<<endl;
         total += distance;
     }
-    cout<<"total distance: "<<total<<endl;
+    // cout<<"total distance: "<<total<<endl;
+
 
     return total;
 }
@@ -52,33 +53,33 @@ void exchange(int vetor[], int inf, int sup, vector<pair<int,int>> p, double &lo
         //getting the hamiltonian cicle of this permutation
         vector<int> hamiltonian;
         string hamiltonian_cicle = "";
-        int total = 0;
+        double total = 0;
         hamiltonian.push_back(1);
         hamiltonian_cicle += to_string(1);        
 		for(int i = 1; i <= sup; i++){
             hamiltonian.push_back(vetor[i]);
             hamiltonian_cicle += to_string(vetor[i]);  
         }
-		printf("\n");
+		// printf("\n");
         hamiltonian.push_back(1);
         hamiltonian_cicle += to_string(1);  
         
         //lines for debug
-                cout<<"ciclo hamiltonian: ";
-                for(int i=0; i<hamiltonian.size(); i++){
-                    cout<<hamiltonian[i];
-                }
-                cout<<"\n";
-
+                // cout<<"ciclo hamiltonian: ";
+                // for(int i=0; i<hamiltonian.size(); i++){
+                //     cout<<hamiltonian[i];
+                // }
+                // cout<<"\n";
+        // cout<<hamiltonian_cicle<<endl;
         total = total_distance(hamiltonian,p);
         cicles++;
         if (total < lower_distance){
-            cout<<"antes\n";
-            cout<<"ciclo: "<<lower_hamiltonian_cicle<<" com distancia: "<<lower_distance<<endl;
+            // cout<<"antes\n";
+            // cout<<"ciclo: "<<lower_hamiltonian_cicle<<" com distancia: "<<lower_distance<<endl;
             lower_distance = total;
             lower_hamiltonian_cicle = hamiltonian_cicle;
-            cout<<"depois \n";
-            cout<<"ciclo: "<<lower_hamiltonian_cicle<<" com distancia: "<<lower_distance<<endl;
+            // cout<<"depois \n";
+            // cout<<"ciclo: "<<lower_hamiltonian_cicle<<" com distancia: "<<lower_distance<<endl;
         }
         
 	}
@@ -109,18 +110,23 @@ int main(int argc, char** argv){
         points.push_back(make_pair(aux[i],aux[i+1]));
     }
 
-    //lines for debug
+    // lines for debug
             // cout<<" ponits \n";
             // for(int i=0; i<points.size(); i++){
             //     cout<<points[i].first <<" "<<points[i].second<<"\n";
             // }
-            //    cout<< distance_between_two_points(make_pair(2,-6),make_pair(7,3))<<endl;
 
 
     int v[n];
     for(int i=0; i<n;i++){
         v[i] = i+1;
     }
+
+    // lines for debug
+            // cout<<"v \n";
+            // for(int i=0; i<n;i++){
+            //     cout<<v[i]<<" ";
+            // }
 	int tam_v = sizeof(v) / sizeof(int);
 
     double lower_distance = DBL_MAX;
@@ -135,7 +141,6 @@ int main(int argc, char** argv){
     stop = chrono::high_resolution_clock::now();
     double duration =chrono::duration<double, ratio<1, 1000>>(stop-start).count();
 
-    cout<<"\n";
     cout<< "hamiltonian cicle with lower distance : "<< lower_hamiltonian_cicle <<"\n";
     cout<< "distance of this cicle = "<<lower_distance<<"\n";
     cout<< cicles << " clicles were generated in "<< duration << "ms \n";
