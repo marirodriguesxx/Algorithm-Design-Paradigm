@@ -1,3 +1,6 @@
+// this code was develop by Mariana Rdrigues (es98875) and Matheus Ximenes (es.....)
+//its a implementation of the quick algorithmto get the convex hull from a set of points
+
 #include<iostream>
 #include <stdio.h>
 #include <vector>
@@ -5,72 +8,46 @@
 #include <algorithm>
 #include <cstdlib>
 #include<algorithm>
+#include<set>
 #include<cmath>
 
 using namespace std;
 
 vector<int> hamiltonian;
 
-void linear_equation( pair<int,int> & pa, pair<int,int> & pb, int & delta_x, int & delta_y, double & additive_constant )
-{
-    int x1, y1, x2, y2;
-    x1 = pa.first; y1 = pa.second;
-    x2 = pb.first; y2 = pb.second;
-
-    delta_x = x2 - x1;
-    delta_y = y2 - y1;
-
-    additive_constant = -( x1*y2 - y1*x2 );
+int get_side( pair<int, int> p1, pair<int, int>p2, pair<int, int> p3 ) {
+    int det = ( p1.first * p2.second ) + ( p3.first * p1.second ) + ( p2.first * p3.second) 
+                    - ( p3.first * p2.second ) - ( p2.first * p1.second) - ( p1.first * p3.second);
+    if (det > 0) return 1; //left side
+    if (det < 0) return -1; //right side
+    return 0; //colinear
 }
 
-int is_on_left( pair<int, int> & p1, pair<int, int> & p2, pair<int, int> & p3 )
-{
-    int det = ( p1.first * p2.second ) + ( p3.first * p1.second ) + ( p2.first * p3.second) - ( p3.first * p2.second ) - ( p2.first * p1.second) - ( p1.first * p3.second);
-    return det;
+int distance_point_to_line(pair<int,int> p1, pair<int,int> p2, pair<int,int> p3) { 
+    int distance = abs ((p3.second - p1.second) * (p2.first - p1.first) 
+                        - (p2.second - p1.second) * (p3.first - p1.first));
+    return distance;
 }
 
-void fill_in_subsets(vector<pair<int, int>> &points, vector<pair<int, int>> &S1, vector<pair<int, int>> &S2, pair<int, int> &pa, pair<int, int> &pb){
-    for( int i = 1 ; i < points.size() - 1 ; i++ )
-    {
-        int verify_subset = is_on_left( pa, pb, points[i] );
-        if( verify_subset > 0 )
-        {
-            S1.push_back( points[i] );
+void fill_s1_s2_subsets( set<pair<int,int>> points, set<pair<int,int>> &S1, 
+                            set<pair<int,int>> &S2, pair<int, int> pa, pair<int, int> pb, 
+                                                        vector<int> &e1, vector<int> &e2 ){
+
+    set<pair<int ,int>> :: iterator it;
+    // the int i will help us to fill the hamiltonian cicle
+    int i=2;
+    for( it = points.begin() ; it != points.end() ; it++ ) {
+        int side = get_side( pa, pb, make_pair(it->first,it->second) );
+        if( side == 1 ){
+            S1.insert( make_pair(it->first,it->second) );
+            e1.push_back( i );
         }
-        else if( verify_subset < 0 )
-        {
-            S2.push_back( points[i] );
+        else if( side == -1 ){
+            S2.insert( make_pair(it->first,it->second) );
+            e2.push_back( i );
         }
+        i++;
     }
-}
-
-void fill_in_subset(vector<pair<int, int>> points, vector<pair<int, int>> &S1, pair<int, int> pa, pair<int, int> pb){
-    for( int i = 0 ; i < points.size()  ; i++ )
-    {
-        int verify_subset = is_on_left( pa, pb, points[i] );
-        if( verify_subset > 0 )
-        {
-            S1.push_back( points[i] );
-        }
-    }
-}
-
-void get_hamiltonian(vector<pair<int, int>> &points, pair<int, int> &pa, pair<int, int> &pb, vector<int> &e1, vector<int> &e2){
-    for( int i = 1 ; i < points.size() - 1 ; i++ )
-    {
-        int verify_subset = is_on_left( pa, pb, points[i] );
-        if( verify_subset > 0 )
-        {
-            e1.push_back( i+1 );
-        }
-        else if( verify_subset < 0 )
-        {
-            e2.push_back( i+1 );
-        }
-    }
-    // cout<<"e1 size: "<<e1.size()<<endl;
-    // cout<<"e2 size: "<<e2.size()<<endl;
-
     hamiltonian.push_back(1);
     for(int i=0;i<e1.size();i++){
         hamiltonian.push_back(e1[i]);
@@ -82,141 +59,135 @@ void get_hamiltonian(vector<pair<int, int>> &points, pair<int, int> &pa, pair<in
     hamiltonian.push_back(1);
 }
 
-double distance_point_to_line(int dx, int dy, int additive_constant, pair<int,int>point)
-{
-    double numerator = abs( (dy*point.first) + (dx*point.second) + additive_constant);
-    double denominator = sqrt( (dx*dx) + (dy*dy) );
-    double distance = numerator/denominator;
-    return distance;
+void fill_in_subsets( set<pair<int,int>> points, set<pair<int,int>> &S1, 
+                                    pair<int, int> pa, pair<int, int> pb) {
+    // we just pick up the points that are above the line
+    set<pair<int ,int>> :: iterator it;
+    for( it = points.begin() ; it != points.end() ; it++ ) {
+        int side = get_side( pa, pb, make_pair(it->first,it->second) );
+        if( side == 1 )
+            S1.insert( make_pair(it->first,it->second) );
+    }
 }
 
-void convex_polygon(int &dx, int &dy, double &additive_constant, vector<pair<int,int>> subset, vector<pair<int, int>> & convex_hull,  pair<int,int> pa, pair<int,int> pb ){
-    if(subset.size() == 0)
-    {
-        cout<<"aqui\n";
-        return;
+int convex_polygon( set<pair<int,int>>subset, set<pair<int,int>> &convex_hull,  
+                                        pair<int,int> pa, pair<int,int> pb, int side ) {
+    // if thres no elements in the set, we stop
+    if(subset.size() == 0) {
+        return -1;
     }
-    else{
-        // -- finding point most disntace of papb
+    else {
+
+        set<pair<int ,int>> :: iterator it;
         int distance_max = 0;
         pair<int,int> p_max;
-        for(int i=0; i<subset.size(); i++){
-            int distance_aux = distance_point_to_line(dx,dy,additive_constant,subset[i]);
-            if(distance_aux > distance_max){
+
+        for( it = subset.begin() ; it != subset.end() ; it++ ){
+
+            int distance_aux = distance_point_to_line(pa,pb,make_pair(it->first,it->second));
+            int get_side_aux = get_side(pa, pb, make_pair(it->first,it->second) );
+
+            // we just look for the poins with distance max and at the same side 
+            if(distance_aux > distance_max && get_side(pa, pb, make_pair(it->first,it->second) ) == side){
                 distance_max = distance_aux;
-                p_max = subset[i];
+                p_max = make_pair(it->first,it->second);
             }
         }
-        convex_hull.push_back(p_max);
-        cout<<"p_max : "<<"("<<p_max.first<<","<<p_max.second<<  ")\n";
 
-        vector<pair<int, int>> S11;
-        vector<pair<int, int>> S22;
+        it=subset.find(p_max);
+        // we need to have sure that the point exists in the set to erase it 
+        // after we inser the max point in the convex hull
+        if (it != subset.end()) {
+            subset.erase (it);
+            convex_hull.insert(p_max);
+        }
+        // if the point dosent exists, we dont have more points to compare
+        // so we need to stop the function
+        else{
+            return -1;
+        }
 
-        fill_in_subset(subset,S11, pa, p_max);
-        fill_in_subset(subset,S22, p_max, pb);
-        //lines for debug
-            cout<<"S11: ";
-            for(int i=0; i<S11.size(); i++)
-                cout<<"("<<S11[i].first<<","<<S11[i].second<<  ") ";
-            cout<<endl;
-            cout<<"S22: ";
-            for(int i=0; i<S22.size(); i++)
-                cout<<"("<<S22[i].first<<","<<S22[i].second<<") ";
-            cout<<endl;
+        // now, we are going to fill the subsets
+        set<pair<int,int>> s11;
+        set<pair<int,int>> s22;
 
-        linear_equation( pa, p_max, dx, dy, additive_constant );
-        convex_polygon(dx , dy , additive_constant , S11, convex_hull, pa, p_max);
-        linear_equation( p_max, pb, dx, dy, additive_constant );
-        convex_polygon(dx , dy , additive_constant , S22, convex_hull, p_max, pb);
-        // cout << "point ("<<p_max.first<<","<<p_max.second<<") have max distance "<<distance_max <<endl;
+        fill_in_subsets(subset,s11, pa, p_max);
+        fill_in_subsets(subset,s11, p_max, pb);
+
+        // and after we call recursion to the new subsets finded
+        convex_polygon( s11, convex_hull, pa, p_max, get_side(pa, p_max, pb) );
+        convex_polygon( s22, convex_hull, p_max, pb, -get_side(p_max, pb, pa) );
     }
+    return 0;
 }
 
-void quick( vector<pair<int, int>> & points, vector<pair<int, int>> & convex_hull )
-{   
-    if(points.size() >= 2){
-    // -- Get first and last point -- //
-    pair<int,int> pa = points[ 0 ];
-    pair<int,int> pb = points[ points.size() - 1 ];    
-    cout<<"pa: "<<"("<<pa.first<<","<<pa.second<<  ") "<<"- pb: "<<"("<<pb.first<<","<<pb.second<<  ")\n ";
-    convex_hull.push_back(pa);  //these points are part of the convex hull !
-    convex_hull.push_back(pb);
+void quick( set<pair<int,int>> points, set<pair<int,int>> &convex_hull ) { 
+    if(points.size() > 3) {
+        // set first and last point (pa and pb)
+        set<pair<int ,int>> :: iterator it;
+        pair<int,int> pa = make_pair(points.begin()->first,points.begin()->second);
+        pair<int,int> pb;
+        for (it = points.begin() ; it != points.end() ; it++ ) {
+            pb = make_pair(it->first,it->second);
+        }
+   
+        //these points are part of the convex hull !
+        convex_hull.insert(pa);  
+        convex_hull.insert(pb);
 
-    // -- Finding Linear Equantion of the points PA and PB --
-    int dx = 0;
-    int dy = 0;
-    double additive_constant = 0;
 
-    linear_equation( pa, pb, dx, dy, additive_constant );
+        set<pair<int,int>> s1;
+        set<pair<int,int>> s2;
+        vector<int> e1;
+        vector<int> e2;
 
-    vector<pair<int, int>> S1;
-    vector<pair<int, int>> S2;
-    vector<int> e1;
-    vector<int> e2;
-
-    // -- we look into all points, excep the first and the last point (pa and pb)     
-    fill_in_subsets(points,S1, S2, pa, pb);
-    get_hamiltonian(points,pa,pb,e1,e2);
-    // cout<<"s1 size: "<<S1.size()<<endl;
-    // cout<<"s2 size: "<<S2.size()<<endl;
-        
-    convex_polygon(dx , dy , additive_constant , S1, convex_hull, pa, pb);
-    convex_polygon(dx , dy , additive_constant , S2, convex_hull, pa, pb);
-    //lines for debug
-            // cout<<"S1: ";
-            // for(int i=0; i<S1.size(); i++)
-            //     cout<<"("<<S1[i].first<<","<<S1[i].second<<  ") ";
-            // cout<<endl;
-            // cout<<"S2: ";
-            // for(int i=0; i<S2.size(); i++)
-            //     cout<<"("<<S2[i].first<<","<<S2[i].second<<") ";
-            // cout<<endl;
+        // we look into all points and define s1 and s2
+        // we also fill auxiliar vetor e1 and e2, we gonna use them to fill hamiltonian cicle
+        fill_s1_s2_subsets(points,s1, s2, pa, pb,e1,e2);
+                
+        // we call the recursive function to get the convex hull
+        // we call first for the left side
+        convex_polygon( s1, convex_hull, pa, pb, 1);
+        // and before we call for the right side
+        convex_polygon( s2, convex_hull, pa, pb, -1 );
     }
+    else { 
+        cout << "Convex hull not possible\n"; 
+        return; 
+    } 
 
 }
 
-int main( int argc, char** argv )
-{
-    ifstream points_file;
+int main( int argc, char** argv ) {
+    ifstream data;
     int num_points = 0;
     int value;
     vector<int> aux;
-    vector<pair<int,int>> points; //saves all points
-    vector<pair<int,int>> convex_hull; //will contain all the points of the convex  hull
+    set<pair<int,int>> points; //saves all points
+    set<pair<int,int>> convex_hull; //will contain all the points of the convex  hull
+    set < pair < int , int > > :: iterator it;
 
-    points_file.open( argv[1] );
-    points_file >> num_points; //getting the number of points in file (first line of each file must contais this information)
+
+
+    data.open( argv[1] );
+    data >> num_points; //getting the number of points in file (first line of each file must contais this information)
 
     
-    while( points_file >> value )
-    {
+    while( data >> value ) {
         aux.push_back( value );
     }
 
-    for( int i=0; i<aux.size(); i=i+2 )
-    {
-        points.push_back( make_pair( aux[i],aux[i+1] ) );
+    for( int i=0; i<aux.size(); i=i+2 ) {
+        points.insert( make_pair( aux[i],aux[i+1] ) );
     }    
-
-     // -- Sortin points by first coordinate -- //
-    sort( points.begin(), points.end() );
-
-    // lines for debug
-            cout<<" points \n";
-            for(int i=0; i<points.size(); i++){
-                cout<<"("<<points[i].first<<","<<points[i].second<<")\n";
-
-            }
-    // cout<<"total points = "<<points.size()<<endl;
 
     quick( points , convex_hull );
 
-    cout<<"points in convex hull = "<<convex_hull.size()<<endl;
+    cout<<"number of elements in convex hull: "<<convex_hull.size()<<endl;
     cout<<"Convex Hull :";
-    for(int i=0; i<convex_hull.size(); i++){
-        cout<<"("<<convex_hull[i].first<<","<<convex_hull[i].second<<") ";
-    }
+    for (it = convex_hull.begin() ; it != convex_hull.end() ; it++ ) {
+            cout<<"("<<it->first<<","<<it->second<<") ";
+        }
     cout<<endl;
     cout<<"Hamiltonian cicle :";
     for(int i=0; i<hamiltonian.size(); i++){
