@@ -116,7 +116,7 @@ void get_hamiltonian(vector<pair<int,int>> points, vector<int> &hamiltonian, set
 
     vector<int>ec1;
     vector<int>ec2;
-    
+
     set<pair<int ,int>> :: iterator it;
     set<pair<int ,int>> :: iterator end;
     vector<pair<int,int>>::iterator it2;
@@ -210,11 +210,8 @@ int main( int argc, char** argv ) {
     vector<int> hamiltonian;
     set < pair < int , int > > :: iterator it;
 
-
-
     data.open( argv[1] );
     data >> num_points; //getting the number of points in file (first line of each file must contais this information)
-
     
     while( data >> value ) {
         aux.push_back( value );
@@ -227,16 +224,14 @@ int main( int argc, char** argv ) {
 
     quick( points, convex_hull );
 
-    cout<<"number of elements in convex hull: "<<convex_hull.size()<<endl;
-    cout<<"Convex Hull :";
+    cout<<"Convex Hull with "<<convex_hull.size()<<" elements : \n";
     for (it = convex_hull.begin() ; it != convex_hull.end() ; it++ ) {
-            cout<<"("<<it->first<<","<<it->second<<") ";
+            cout<<"("<<it->first<<","<<it->second<<") \n";
     }
-    cout<<endl;
 
     get_hamiltonian(points_index,hamiltonian,convex_hull);
 
-    cout<<"Hamiltonian cicle :";
+    cout<<"\nHamiltonian cicle : \n";
     for(int i=0; i<hamiltonian.size(); i++){
         cout<<hamiltonian[i]<<" ";
     }
