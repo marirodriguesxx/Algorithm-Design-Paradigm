@@ -24,11 +24,11 @@ int get_side( pair<int, int> p1, pair<int, int>p2, pair<int, int> p3 ) {
 }
 
 // return the distance between p3 and the line p1p2
-int distance_point_to_line(pair<int,int> p1, pair<int,int> p2, pair<int,int> p3) { 
+double distance_point_to_line(pair<int,int> p1, pair<int,int> p2, pair<int,int> p3) { 
     int a = p2.second - p1.second;
     int b = p1.first - p2.first;
     int c = -(p1.first*p2.second -p1.second*p2.first );
-    int distance = (abs(a*p3.first + b*p3.second + c )/sqrt(a*a + b*b));
+    double distance = (abs(a*p3.first + b*p3.second + c )/sqrt(a*a + b*b));
     return distance;
 }
 
@@ -99,12 +99,12 @@ int convex_polygon( set<pair<int,int>>subset, set<pair<int,int>> &convex_hull,
         for (it = subset.begin() ; it != subset.end() ; it++ ) {
             cout<<"("<<it->first<<","<<it->second<<")\n";
         }
-        int distance_max = 0;
+        double distance_max = 0;
         pair<int,int> p_max;
 
         for( it = subset.begin() ; it != subset.end() ; it++ ){
 
-            int distance_aux = distance_point_to_line(pa,pb,make_pair(it->first,it->second));
+            double distance_aux = distance_point_to_line(pa,pb,make_pair(it->first,it->second));
             cout<<"("<<it->first<<","<<it->second<<") with distance " << distance_aux<<"\n";
             // we just look for the poins with distance max and at the same side 
             if(distance_aux > distance_max ){
