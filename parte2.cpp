@@ -224,10 +224,25 @@ int main( int argc, char** argv ) {
 
     quick( points, convex_hull );
 
+    // creating input to third part
+    string fileName("inputToThirdPart.txt");
+    ofstream file_out;
+    //file_out.open( fileName, std::ios_base::app );
+
+    file_out.open(fileName);
+    if( !file_out ) { 
+      cout << "Error: file could not be opened" << endl;
+      exit(1);
+   }
+
     cout<<"Convex Hull with "<<convex_hull.size()<<" elements : \n";
+    file_out<<convex_hull.size()<<"\n";
     for (it = convex_hull.begin() ; it != convex_hull.end() ; it++ ) {
             cout<<"("<<it->first<<","<<it->second<<") \n";
+            file_out <<it->first<<" "<<it->second << "\n";
     }
+
+    file_out.close();
 
     get_hamiltonian(points_index,hamiltonian,convex_hull);
 
