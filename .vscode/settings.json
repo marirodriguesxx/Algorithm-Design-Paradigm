@@ -2,6 +2,9 @@
     "files.associations": {
         "iostream": "cpp",
         "chrono": "cpp",
-        "cstdlib": "cpp"
+        "cstdlib": "cpp",
+        "utility": "cpp",
+        "vector": "cpp",
+        "set": "cpp"
     }
 }
