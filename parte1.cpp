@@ -36,13 +36,6 @@ double total_distance(vector<int> hamiltonian, vector<pair<int,int>> points){
     return total;
 }
 
-void imprime (vector<int> hamiltonian){
-    cout<<"points \n";
-    for( int i=0; i<hamiltonian.size(); i++){
-        cout<<points[hamiltonian[i]-1].first<<" "<<points[hamiltonian[i]-1].second<<"\n";
-    }
-}
-
 void exchange(int vetor[], int inf, int sup, vector<pair<int,int>> p, double &lower_distance, string &lower_hamiltonian_cicle,int &cicles){
 	
     stop = chrono::high_resolution_clock::now();
@@ -64,7 +57,6 @@ void exchange(int vetor[], int inf, int sup, vector<pair<int,int>> p, double &lo
         hamiltonian.push_back(1);
         hamiltonian_cicle += to_string(1) + " ";  
         
-        imprime(hamiltonian);
         total = total_distance(hamiltonian,p);
         cicles++;
         if (total < lower_distance){
@@ -99,27 +91,14 @@ int main(int argc, char** argv){
         points.push_back(make_pair(aux[i],aux[i+1]));
     }
 
-    // lines for debug
-            // cout<<" ponits \n";
-            // for(int i=0; i<points.size(); i++){
-            //     cout<<points[i].first <<" "<<points[i].second<<"\n";
-            // }
-
-
     int v[n];
     for(int i=0; i<n;i++){
         v[i] = i+1;
     }
 
-    // lines for debug
-            // cout<<"v \n";
-            // for(int i=0; i<n;i++){
-            //     cout<<v[i]<<" ";
-            // }
 	int tam_v = sizeof(v) / sizeof(int);
 
     double lower_distance = DBL_MAX;
-    // cout<<lower_distance<<endl;
     string lower_hamiltonian_cicle = "";
     int cicles = 0;
 
