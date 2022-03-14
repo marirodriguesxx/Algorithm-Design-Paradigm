@@ -12,8 +12,12 @@
 #include<cmath>
 #include <iterator>
 #include<bits/stdc++.h>
+#include <chrono>
 
 using namespace std;
+using namespace std::chrono;
+
+chrono::time_point<chrono::high_resolution_clock> start, stop;
 
 
 int get_side( pair<int, int> p1, pair<int, int>p2, pair<int, int> p3 ) {
@@ -220,20 +224,24 @@ int main( int argc, char** argv ) {
     for( int i=0; i<aux.size(); i=i+2 ) {
         points.insert( make_pair( aux[i],aux[i+1] ) );
         points_index.push_back( make_pair( aux[i],aux[i+1] ) );
-    }    
+    }
+
+    // --- Start Time --- //
+    start = chrono::high_resolution_clock::now();
 
     quick( points, convex_hull );
+    // --- --- //
 
     // creating input to third part
     string fileName("inputToThirdPart.txt");
     ofstream file_out;
-    //file_out.open( fileName, std::ios_base::app );
 
     file_out.open(fileName);
-    if( !file_out ) { 
+    if( !file_out )
+    { 
       cout << "Error: file could not be opened" << endl;
       exit(1);
-   }
+    }
 
     cout<<"Convex Hull with "<<convex_hull.size()<<" elements : \n";
     file_out<<convex_hull.size()<<"\n";
@@ -244,6 +252,12 @@ int main( int argc, char** argv ) {
     }
 
     file_out.close();
+
+    // --- Stop Time --- //
+    stop = chrono::high_resolution_clock::now();
+    double duration =chrono::duration<double, ratio<1, 1000>>(stop-start).count();
+    cout<< "Duration: " << duration << "ms \n";
+    // --- --- //
 
     get_hamiltonian(points_index,hamiltonian,convex_hull);
 

@@ -8,8 +8,12 @@
 #include <cstdlib>
 #include <iterator>
 #include<bits/stdc++.h>
+#include <chrono>
 
 using namespace std;
+using namespace std::chrono;
+
+chrono::time_point<chrono::high_resolution_clock> start, stop;
 
 int get_side( pair<int, int> p1, pair<int, int>p2, pair<int, int> p3 ) 
 {
@@ -200,41 +204,56 @@ int main(int argc, char **argv )
         }
         points_index.push_back( make_pair( aux[i],aux[i+1] ) );
     }
-    // cout<<"points\n";
-    // for(int i=0; i<points_index.size(); i++){
-    //     cout<<"("<<points_index[i].first<<","<<points_index[i].second<<") \n";
-    // }
     // --- --- //
 
-    // --- DEBUG --- //
-    cout << "Convex hull" << endl;
-    for (it = convex_hull.begin() ; it != convex_hull.end() ; it++ ) {
-            cout<<"("<<it->first<<","<<it->second<<") \n";
-    }
-    /*cout << "-----" << endl;
-    for (it = points.begin() ; it != points.end() ; it++ ) {
-            cout<<"("<<it->first<<","<<it->second<<") \n";
-    }*/
+     // --- DEBUG --- //
+        // cout<<"points\n";
+        // for(int i=0; i<points_index.size(); i++){
+        //     cout<<"("<<points_index[i].first<<","<<points_index[i].second<<") \n";
+        // }
+        // --- --- //
+
+    
+        cout << "Convex hull" << endl;
+        for (it = convex_hull.begin() ; it != convex_hull.end() ; it++ ) {
+                cout<<"("<<it->first<<","<<it->second<<") \n";
+        }
+        /*cout << "-----" << endl;
+        for (it = points.begin() ; it != points.end() ; it++ ) {
+                cout<<"("<<it->first<<","<<it->second<<") \n";
+        }*/
+    // --- --- //
+
+    // --- Start Time --- //
+    start = chrono::high_resolution_clock::now();
     // --- --- //
 
     insert_points( convex_hull, points );
 
-    // --- DEBUG --- //
-    cout << "\nAfter insertions" << endl;
-    for (it = convex_hull.begin() ; it != convex_hull.end() ; it++ ) {
-            cout<<"("<<it->first<<","<<it->second<<") \n";
-    }
+    // --- Stop Time --- //
+    stop = chrono::high_resolution_clock::now();
+    double duration =chrono::duration<double, ratio<1, 1000>>(stop-start).count();
+    cout<< "Duration: " << duration << "ms \n";
+    // --- --- //
 
-    get_hamiltonian( points_index, hamiltonian, convex_hull );
-    cout<<"\nHamiltonian cicle : \n";
-    for(int i=0; i<hamiltonian.size(); i++){
-        cout<<hamiltonian[i]<<" ";
-    }
-    cout<<endl;
-    /*cout << "-----" << endl;
-    for (it = points.begin() ; it != points.end() ; it++ ) {
-            cout<<"("<<it->first<<","<<it->second<<") \n";
-    }*/
+
+
+    // --- DEBUG --- //
+        cout << "\nAfter insertions" << endl;
+        for (it = convex_hull.begin() ; it != convex_hull.end() ; it++ ) {
+                cout<<"("<<it->first<<","<<it->second<<") \n";
+        }
+
+        get_hamiltonian( points_index, hamiltonian, convex_hull );
+        cout<<"\nHamiltonian cicle : \n";
+        for(int i=0; i<hamiltonian.size(); i++){
+            cout<<hamiltonian[i]<<" ";
+        }
+        cout<<endl;
+        /*cout << "-----" << endl;
+        for (it = points.begin() ; it != points.end() ; it++ ) {
+                cout<<"("<<it->first<<","<<it->second<<") \n";
+        }*/
     // --- --- //
 
     return 0;
