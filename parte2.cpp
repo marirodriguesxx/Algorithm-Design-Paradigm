@@ -228,8 +228,14 @@ int main( int argc, char** argv ) {
 
     // --- Start Time --- //
     start = chrono::high_resolution_clock::now();
+    // --- --- //
 
     quick( points, convex_hull );
+    
+    // --- Stop Time --- //
+    stop = chrono::high_resolution_clock::now();
+    double duration =chrono::duration<double, ratio<1, 1000>>(stop-start).count();
+    cout<< "Duration: " << duration << "ms \n";
     // --- --- //
 
     // creating input to third part
@@ -252,12 +258,6 @@ int main( int argc, char** argv ) {
     }
 
     file_out.close();
-
-    // --- Stop Time --- //
-    stop = chrono::high_resolution_clock::now();
-    double duration =chrono::duration<double, ratio<1, 1000>>(stop-start).count();
-    cout<< "Duration: " << duration << "ms \n";
-    // --- --- //
 
     get_hamiltonian(points_index,hamiltonian,convex_hull);
 
