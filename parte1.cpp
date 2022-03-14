@@ -55,14 +55,14 @@ void exchange(int vetor[], int inf, int sup, vector<pair<int,int>> p, double &lo
         string hamiltonian_cicle = "";
         double total = 0;
         hamiltonian.push_back(1);
-        hamiltonian_cicle += to_string(1);        
+        hamiltonian_cicle += to_string(1)+ " ";        
 		for(int i = 1; i <= sup; i++){
             hamiltonian.push_back(vetor[i]);
-            hamiltonian_cicle += to_string(vetor[i]);  
+            hamiltonian_cicle += to_string(vetor[i]) + " ";  
         }
 		// printf("\n");
         hamiltonian.push_back(1);
-        hamiltonian_cicle += to_string(1);  
+        hamiltonian_cicle += to_string(1) + " ";  
         
         //lines for debug
                 // cout<<"ciclo hamiltonian: ";
