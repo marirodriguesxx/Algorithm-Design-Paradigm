@@ -94,8 +94,7 @@ void insert_points( set< pair<int, int> > & convex_hull, set< pair<int, int> > &
     }
 }
 
-void get_hamiltonian(vector<pair<int,int>> points, vector<int> &hamiltonian, set<pair<int,int>> convex_hull ) 
-{
+void get_hamiltonian(vector<pair<int,int>> points, vector<int> &hamiltonian, set<pair<int,int>> convex_hull ) {
 
     vector<int>ec1;
     vector<int>ec2;
@@ -112,12 +111,12 @@ void get_hamiltonian(vector<pair<int,int>> points, vector<int> &hamiltonian, set
     }
 
     it2 = std::find (points.begin(), points.end(), pa);
-    int pa_index = std::distance(points.begin(),it2) + 1;
-    // cout<<"ponto pa ("<<pa.first<<","<<pa.second<<") com indice "<<pa_index<<endl;
+    int pa_index = std::distance(points.begin(),it2) +1;
     
     it2 = std::find (points.begin(), points.end(), pb);
     int pb_index = std::distance(points.begin(),it2 ) +1;
-    // cout<<"ponto pb ("<<pb.first<<","<<pb.second<<") com indice "<<pb_index<<endl;
+    // cout<<"pa ("<<pa.first<<","<<pa.second<<") com indice "<<pa_index<<endl;
+    // cout<<"pb ("<<pb.first<<","<<pb.second<<") com indice "<<pb_index<<endl;
 
     convex_hull.erase(convex_hull.begin());
     convex_hull.erase(end);
@@ -126,9 +125,10 @@ void get_hamiltonian(vector<pair<int,int>> points, vector<int> &hamiltonian, set
 
         pair<int,int> point = make_pair(it->first,it->second);
         it2 = std::find (points.begin(), points.end(), point);
-        int index = std::distance(points.begin(),it2) + 1;
+        int index = std::distance(points.begin(),it2)+1;
+        // cout<<index<<endl;
         int side = get_side(pa,pb,point);
-        // cout<<"ponto ("<<point.first<<","<<point.second<<") com indice "<<index<<endl;
+        // cout<<"point ("<<point.first<<","<<point.second<<") com indice "<<index<<endl;
         if(side == 1){ ec1.push_back(index); }
         else if (side == -1 ){ ec2.push_back(index); }
     }

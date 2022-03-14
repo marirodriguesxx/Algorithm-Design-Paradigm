@@ -59,20 +59,11 @@ void fill_in_subsets( set<pair<int,int>> points, set<pair<int,int>> &s1,
     //the flag will tell us the righ correction
     // because if we are 
     set<pair<int ,int>> :: iterator it;
-    // cout<<"line: "<<"("<<pa.first<<","<<pa.second<<") to "<<"("<<pb.first<<","<<pb.second<<")\n";
     for( it = points.begin() ; it != points.end() ; it++ ) {
-        // cout<<" point: ("<<it->first<<","<<it->second<<") ";
         int side = get_side(pa,pb, make_pair(it->first,it->second));
         if (side*flag == 1) {
-            // cout<<"is on left side\n";
             s1.insert(make_pair(it->first,it->second));
         }
-        // else if (side*flag == -1) {
-        //      cout<<"is on right side\n";
-        // }
-        // else{
-        //     cout<<"is on the line \n";
-        // }
     }
 }
 
@@ -133,10 +124,12 @@ void get_hamiltonian(vector<pair<int,int>> points, vector<int> &hamiltonian, set
     }
 
     it2 = std::find (points.begin(), points.end(), pa);
-    int pa_index = std::distance(points.begin(),it2);
+    int pa_index = std::distance(points.begin(),it2) +1;
     
     it2 = std::find (points.begin(), points.end(), pb);
-    int pb_index = std::distance(points.begin(),it2 );
+    int pb_index = std::distance(points.begin(),it2 ) +1;
+    // cout<<"pa ("<<pa.first<<","<<pa.second<<") com indice "<<pa_index<<endl;
+    // cout<<"pb ("<<pb.first<<","<<pb.second<<") com indice "<<pb_index<<endl;
 
     convex_hull.erase(convex_hull.begin());
     convex_hull.erase(end);
@@ -145,11 +138,12 @@ void get_hamiltonian(vector<pair<int,int>> points, vector<int> &hamiltonian, set
 
         pair<int,int> point = make_pair(it->first,it->second);
         it2 = std::find (points.begin(), points.end(), point);
-        int index = std::distance(points.begin(),it2);
+        int index = std::distance(points.begin(),it2)+1;
+        // cout<<index<<endl;
         int side = get_side(pa,pb,point);
-
-        if(side == 1){ ec1.push_back(index+2); }
-        else if (side == -1 ){ ec2.push_back(index+2); }
+        // cout<<"point ("<<point.first<<","<<point.second<<") com indice "<<index<<endl;
+        if(side == 1){ ec1.push_back(index); }
+        else if (side == -1 ){ ec2.push_back(index); }
     }
     
     hamiltonian.push_back(pa_index);
