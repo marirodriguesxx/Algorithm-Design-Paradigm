@@ -237,6 +237,7 @@ int main( int argc, char** argv ) {
 
     cout<<"Convex Hull with "<<convex_hull.size()<<" elements : \n";
     file_out<<convex_hull.size()<<"\n";
+    
     for (it = convex_hull.begin() ; it != convex_hull.end() ; it++ ) {
             cout<<"("<<it->first<<","<<it->second<<") \n";
             file_out <<it->first<<" "<<it->second << "\n";

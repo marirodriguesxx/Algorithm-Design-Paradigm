@@ -4,7 +4,21 @@
 #include<vector>
 #include<cmath>
 #include<cfloat>
+#include <algorithm>
+#include <cstdlib>
+#include <iterator>
+#include<bits/stdc++.h>
+
 using namespace std;
+
+int get_side( pair<int, int> p1, pair<int, int>p2, pair<int, int> p3 ) 
+{
+    int det = ( p1.first * p2.second ) + ( p3.first * p1.second ) + ( p2.first * p3.second) 
+                    - ( p3.first * p2.second ) - ( p2.first * p1.second) - ( p1.first * p3.second);
+    if (det > 0) return 1; //left side
+    if (det < 0) return -1; //right side
+    return 0; //colinear
+}
 
 double distance_between_points( pair<int, int> p1, pair<int, int> p2 )
 {
@@ -43,7 +57,7 @@ void insert_points( set< pair<int, int> > & convex_hull, set< pair<int, int> > &
                         lower_point.first = it2->first;
                         lower_point.second = it2->second;
                     }
-                    cout << "cheguei no último ponto ele é: " << it->first << " " << it->second << endl;
+                    // cout << "cheguei no último ponto ele é: " << it->first << " " << it->second << endl;
                 }
                 else
                 {
@@ -67,13 +81,64 @@ void insert_points( set< pair<int, int> > & convex_hull, set< pair<int, int> > &
             }
             points.erase( lower_point );
             convex_hull.insert( lower_point );
-            cout << "Estou inserindo: " << lower_point.first << " " << lower_point.second << endl;
+            // cout << "Estou inserindo: " << lower_point.first << " " << lower_point.second << endl;
         }
         else
         {
             return;
         }
     }
+}
+
+void get_hamiltonian(vector<pair<int,int>> points, vector<int> &hamiltonian, set<pair<int,int>> convex_hull ) 
+{
+
+    vector<int>ec1;
+    vector<int>ec2;
+
+    set<pair<int ,int>> :: iterator it;
+    set<pair<int ,int>> :: iterator end;
+    vector<pair<int,int>>::iterator it2;
+
+    pair<int,int> pa = make_pair(convex_hull.begin()->first,convex_hull.begin()->second);
+    pair<int,int> pb;
+    for (it = convex_hull.begin() ; it != convex_hull.end() ; it++ ) { 
+        pb = make_pair(it->first,it->second);
+        end = it;
+    }
+
+    it2 = std::find (points.begin(), points.end(), pa);
+    int pa_index = std::distance(points.begin(),it2) + 1;
+    // cout<<"ponto pa ("<<pa.first<<","<<pa.second<<") com indice "<<pa_index<<endl;
+    
+    it2 = std::find (points.begin(), points.end(), pb);
+    int pb_index = std::distance(points.begin(),it2 ) +1;
+    // cout<<"ponto pb ("<<pb.first<<","<<pb.second<<") com indice "<<pb_index<<endl;
+
+    convex_hull.erase(convex_hull.begin());
+    convex_hull.erase(end);
+
+    for (it = convex_hull.begin() ; it != convex_hull.end() ; it++ ) {
+
+        pair<int,int> point = make_pair(it->first,it->second);
+        it2 = std::find (points.begin(), points.end(), point);
+        int index = std::distance(points.begin(),it2) + 1;
+        int side = get_side(pa,pb,point);
+        // cout<<"ponto ("<<point.first<<","<<point.second<<") com indice "<<index<<endl;
+        if(side == 1){ ec1.push_back(index); }
+        else if (side == -1 ){ ec2.push_back(index); }
+    }
+    
+    hamiltonian.push_back(pa_index);
+    for(int i=0; i<ec1.size(); i++){
+        hamiltonian.push_back(ec1[i]);
+    }
+    hamiltonian.push_back(pb_index);
+    for(int i=ec2.size()-1; i>=0; i--){
+        hamiltonian.push_back(ec2[i]);
+    }
+    hamiltonian.push_back(pa_index);
+
 }
 
 int main(int argc, char **argv )
@@ -88,6 +153,9 @@ int main(int argc, char **argv )
 
     int points_size;
     set< pair<int, int> > points;
+    vector<pair<int,int>> points_index; //saves all points to get they index later
+
+    vector<int> hamiltonian;
 
     convex_hull_data.open( argv[1] );
     points_data.open( argv[2] );
@@ -130,12 +198,16 @@ int main(int argc, char **argv )
         {
             points.insert( make_pair( aux[i],aux[i+1] ) );
         }
-        //points_index.push_back( make_pair( aux[i],aux[i+1] ) );
+        points_index.push_back( make_pair( aux[i],aux[i+1] ) );
     }
+    // cout<<"points\n";
+    // for(int i=0; i<points_index.size(); i++){
+    //     cout<<"("<<points_index[i].first<<","<<points_index[i].second<<") \n";
+    // }
     // --- --- //
 
     // --- DEBUG --- //
-    cout << "ANTES" << endl;
+    cout << "Convex hull" << endl;
     for (it = convex_hull.begin() ; it != convex_hull.end() ; it++ ) {
             cout<<"("<<it->first<<","<<it->second<<") \n";
     }
@@ -148,10 +220,17 @@ int main(int argc, char **argv )
     insert_points( convex_hull, points );
 
     // --- DEBUG --- //
-    cout << "Depois" << endl;
+    cout << "\nAfter insertions" << endl;
     for (it = convex_hull.begin() ; it != convex_hull.end() ; it++ ) {
             cout<<"("<<it->first<<","<<it->second<<") \n";
     }
+
+    get_hamiltonian( points_index, hamiltonian, convex_hull );
+    cout<<"\nHamiltonian cicle : \n";
+    for(int i=0; i<hamiltonian.size(); i++){
+        cout<<hamiltonian[i]<<" ";
+    }
+    cout<<endl;
     /*cout << "-----" << endl;
     for (it = points.begin() ; it != points.end() ; it++ ) {
             cout<<"("<<it->first<<","<<it->second<<") \n";
