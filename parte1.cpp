@@ -12,7 +12,7 @@ using namespace std::chrono;
 using namespace std;
 
 chrono::time_point<chrono::high_resolution_clock> start, stop;
-
+vector<pair<int,int>> points;
 
 double distance_between_two_points(pair<int,int> a, pair<int,int> b){
     int x_axis = (b.first - a.first)*(b.first - a.first);
@@ -31,15 +31,16 @@ double total_distance(vector<int> hamiltonian, vector<pair<int,int>> points){
     double total = 0;
     for(int i=0; i<hamiltonian.size()-1;i++){
         double distance = distance_between_two_points(points[hamiltonian[i]-1], points[hamiltonian[i+1]-1]);
-        // //lines for debug
-        //     cout<<"distance between "<<points[hamiltonian[i]-1].first<<","<<points[hamiltonian[i]-1].second
-        //     <<" and "<<points[hamiltonian[i+1]-1].first<<","<<points[hamiltonian[i+1]-1].second<<"="<< distance<<endl;
         total += distance;
     }
-    // cout<<"total distance: "<<total<<endl;
-
-
     return total;
+}
+
+void imprime (vector<int> hamiltonian){
+    cout<<"points \n";
+    for( int i=0; i<hamiltonian.size(); i++){
+        cout<<points[hamiltonian[i]-1].first<<" "<<points[hamiltonian[i]-1].second<<"\n";
+    }
 }
 
 void exchange(int vetor[], int inf, int sup, vector<pair<int,int>> p, double &lower_distance, string &lower_hamiltonian_cicle,int &cicles){
@@ -60,26 +61,15 @@ void exchange(int vetor[], int inf, int sup, vector<pair<int,int>> p, double &lo
             hamiltonian.push_back(vetor[i]);
             hamiltonian_cicle += to_string(vetor[i]) + " ";  
         }
-		// printf("\n");
         hamiltonian.push_back(1);
         hamiltonian_cicle += to_string(1) + " ";  
         
-        //lines for debug
-                // cout<<"ciclo hamiltonian: ";
-                // for(int i=0; i<hamiltonian.size(); i++){
-                //     cout<<hamiltonian[i];
-                // }
-                // cout<<"\n";
-        // cout<<hamiltonian_cicle<<endl;
+        imprime(hamiltonian);
         total = total_distance(hamiltonian,p);
         cicles++;
         if (total < lower_distance){
-            // cout<<"antes\n";
-            // cout<<"ciclo: "<<lower_hamiltonian_cicle<<" com distancia: "<<lower_distance<<endl;
             lower_distance = total;
             lower_hamiltonian_cicle = hamiltonian_cicle;
-            // cout<<"depois \n";
-            // cout<<"ciclo: "<<lower_hamiltonian_cicle<<" com distancia: "<<lower_distance<<endl;
         }
         
 	}
@@ -97,7 +87,6 @@ int main(int argc, char** argv){
     int n = 0;
     int value;
     vector<int> aux;
-    vector<pair<int,int>> points; //saves all points
 
     pointsFile.open(argv[1]);    
     pointsFile >> n; //getting the number of points in file (first line of each file must contais this information)
