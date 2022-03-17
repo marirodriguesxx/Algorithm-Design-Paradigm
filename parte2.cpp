@@ -107,7 +107,7 @@ int convex_polygon( set<pair<int,int>>subset, set<pair<int,int>> &convex_hull,
     return 0;
 }
 
-void get_hamiltonian(vector<pair<int,int>> points, vector<int> &hamiltonian, set<pair<int,int>> convex_hull ) {
+void get_complete_convex_hull(vector<pair<int,int>> points, vector<int> &complete_convex_hull, set<pair<int,int>> convex_hull ) {
 
     vector<int>ec1;
     vector<int>ec2;
@@ -146,15 +146,15 @@ void get_hamiltonian(vector<pair<int,int>> points, vector<int> &hamiltonian, set
         else if (side == -1 ){ ec2.push_back(index); }
     }
     
-    hamiltonian.push_back(pa_index);
+    complete_convex_hull.push_back(pa_index);
     for(int i=0; i<ec1.size(); i++){
-        hamiltonian.push_back(ec1[i]);
+        complete_convex_hull.push_back(ec1[i]);
     }
-    hamiltonian.push_back(pb_index);
+    complete_convex_hull.push_back(pb_index);
     for(int i=ec2.size()-1; i>=0; i--){
-        hamiltonian.push_back(ec2[i]);
+        complete_convex_hull.push_back(ec2[i]);
     }
-    hamiltonian.push_back(pa_index);
+    complete_convex_hull.push_back(pa_index);
 
 }
 
@@ -178,7 +178,7 @@ void quick( set<pair<int,int>> points, set<pair<int,int>> &convex_hull ) {
         set<pair<int,int>> s2;
 
         // we look into all points and define s1 and s2
-        // we also fill auxiliar vetor e1 and e2, we gonna use them to fill hamiltonian cicle
+        // we also fill auxiliar vetor e1 and e2, we gonna use them to fill complete_convex_hull cicle
         fill_s1_s2_subsets(points,s1, s2, pa, pb );
                 
         // we call the recursive function to get the convex hull
@@ -205,7 +205,7 @@ int main( int argc, char** argv ) {
     set<pair<int,int>> points; //saves all points sorted
     vector<pair<int,int>> points_index; //saves all points to get they index later
     set<pair<int,int>> convex_hull; //will contain all the points of the convex  hull
-    vector<int> hamiltonian;
+    vector<int> complete_convex_hull;
     set < pair < int , int > > :: iterator it;
 
     data.open( argv[1] );
@@ -232,10 +232,21 @@ int main( int argc, char** argv ) {
     cout<< "Duration: " << duration << "ms \n";
     // --- --- //
 
+    cout<<"Convex Hull with "<<convex_hull.size()<<" elements : \n";
+    
+    for (it = convex_hull.begin() ; it != convex_hull.end() ; it++ ) {
+            cout<<"("<<it->first<<","<<it->second<<") \n";
+    }
+
+
+    get_complete_convex_hull(points_index,complete_convex_hull,convex_hull);
+    cout<<"\ncomplete_convex_hull cicle : \n";
+
     // creating input to third part
     string fileName("inputToThirdPart.txt");
     ofstream file_out;
 
+    
     file_out.open(fileName);
     if( !file_out )
     { 
@@ -243,23 +254,16 @@ int main( int argc, char** argv ) {
       exit(1);
     }
 
-    cout<<"Convex Hull with "<<convex_hull.size()<<" elements : \n";
-    file_out<<convex_hull.size()<<"\n";
-    
-    for (it = convex_hull.begin() ; it != convex_hull.end() ; it++ ) {
-            cout<<"("<<it->first<<","<<it->second<<") \n";
-            file_out <<it->first<<" "<<it->second << "\n";
-    }
+    file_out<<complete_convex_hull.size()<<"\n";
 
-    file_out.close();
+    for(int i=0; i<complete_convex_hull.size(); i++){
+        cout<<complete_convex_hull[i]<<" ";
+        file_out <<points_index[complete_convex_hull[i]-1].first<<" "<<points_index[complete_convex_hull[i]-1].second<< "\n";
 
-    get_hamiltonian(points_index,hamiltonian,convex_hull);
-
-    cout<<"\nHamiltonian cicle : \n";
-    for(int i=0; i<hamiltonian.size(); i++){
-        cout<<hamiltonian[i]<<" ";
     }
     cout<<endl;
+    file_out.close();
+
 
     return 0;
 }
