@@ -1,27 +1,18 @@
-#include<iostream>
-#include<fstream>
-#include<set>
-#include<vector>
-#include<cmath>
-#include<cfloat>
+#include <iostream>
+#include <fstream>
+#include <set>
+#include <vector>
+#include <cmath>
+#include <cfloat>
 #include <algorithm>
 #include <cstdlib>
 #include <iterator>
-#include<bits/stdc++.h>
+#include <bits/stdc++.h>
 #include <chrono>
+
 
 using namespace std;
 using namespace std::chrono;
-
-
-int get_side( pair<int, int> p1, pair<int, int>p2, pair<int, int> p3 ) 
-{
-    int det = ( p1.first * p2.second ) + ( p3.first * p1.second ) + ( p2.first * p3.second) 
-                    - ( p3.first * p2.second ) - ( p2.first * p1.second) - ( p1.first * p3.second);
-    if (det > 0) return 1; //left side
-    if (det < 0) return -1; //right side
-    return 0; //colinear
-}
 
 double distance_between_points( pair<int, int> p1, pair<int, int> p2 )
 {
@@ -31,139 +22,117 @@ double distance_between_points( pair<int, int> p1, pair<int, int> p2 )
    return distance; 
 }
 
-void insert_points( set< pair<int, int> > & convex_hull, set< pair<int, int> > & points )
+bool is_in( vector<pair<int,int>> &vetor, pair<int,int> elem )
 {
-    set< pair<int, int> >::iterator it;
+    for( int i = 0 ; i < vetor.size() ; i++ )
+    {
+        if( vetor[i].first == elem.first && vetor[i].second == elem.second  )
+        {
+            return true;
+        }
+    }
+    return false;
+}
+
+void insert_points( vector< pair<int, int> > & convex_hull, set< pair<int, int> > & points )
+{
+    vector< pair<int, int> >::iterator it;
     set< pair<int, int> >::iterator it2;
     double lower_distance = DBL_MAX;
     pair<int, int> lower_point;
 
-    for( it = convex_hull.begin() ; it != convex_hull.end() ; it++ ){
-        lower_distance = DBL_MAX;
-        if( points.size() != 0 )
+    pair<int,int> point_i;
+    pair<int,int> point_j;
+    pair<int,int> point_p;
+
+
+    while( points.size() > 0 )
+    {        
+        vector< pair<int,int> > hamiltonian_cycle;
+        for( int i = 0 ; i < convex_hull.size() - 1 ; i++ )
         {
+            lower_distance = DBL_MAX;
+            point_i = make_pair( convex_hull[i].first, convex_hull[i].second );
+            
             for( it2 = points.begin() ; it2 != points.end() ; it2++ )
             {
-                
-                if( it++ == convex_hull.end() )
-                {
-                    it--;
-                    set< pair<int, int> >::iterator it_begin = convex_hull.begin();
-                    double distance_points_convex_hull = distance_between_points( make_pair(it->first,it->second), make_pair(it_begin->first,it_begin->second) );
-                    double distance_E_N_1 = distance_between_points( make_pair(it->first,it->second), make_pair(it2->first,it2->second) );
-                    double distance_E_N_2 = distance_between_points( make_pair(it2->first,it2->second), make_pair(it_begin->first,it_begin->second) );
+                point_p = make_pair( it2->first, it2->second );
 
-                    double distance = ( distance_E_N_1 + distance_E_N_2 ) - distance_points_convex_hull;
-                    if( distance < lower_distance )
-                    {
-                        lower_distance = distance;
-                        lower_point.first = it2->first;
-                        lower_point.second = it2->second;
-                    }
-                    // cout << "cheguei no último ponto ele é: " << it->first << " " << it->second << endl;
-                }
-                else
-                {
-                    it--;
-                    it++;
-                    int p1 = it->first;
-                    int p2 = it->second;
-                    it--;
-                    double distance_points_convex_hull = distance_between_points( make_pair(it->first,it->second), make_pair(p1,p2) );
-                    double distance_E_N_1 = distance_between_points( make_pair(it->first,it->second), make_pair(it2->first,it2->second) );
-                    double distance_E_N_2 = distance_between_points( make_pair(it2->first,it2->second), make_pair(p1,p2) );
+                point_j = make_pair( convex_hull[i+1].first, convex_hull[i+1].second );
 
-                    double distance = ( distance_E_N_1 + distance_E_N_2 ) - distance_points_convex_hull;
-                    if( distance < lower_distance )
-                    {
-                        lower_distance = distance;
-                        lower_point.first = it2->first;
-                        lower_point.second = it2->second;
-                    }
+                double distance_points_Pi_Pj = distance_between_points( point_i, point_j );
+                double distance_points_Pi_Pp = distance_between_points( point_i, point_p );
+                double distance_points_Pp_Pj = distance_between_points( point_p, point_j );
+
+                double distance = ( distance_points_Pi_Pp + distance_points_Pp_Pj ) - distance_points_Pi_Pj;
+
+                if( distance < lower_distance )
+                {
+                    lower_distance = distance;
+                    lower_point = make_pair( it2->first, it2->second );
                 }
             }
+
             points.erase( lower_point );
-            convex_hull.insert( lower_point );
-            // cout << "Estou inserindo: " << lower_point.first << " " << lower_point.second << endl;
+
+            if( hamiltonian_cycle.size() == 0 )
+            {
+                hamiltonian_cycle.push_back( point_i );
+                hamiltonian_cycle.push_back( lower_point );
+                hamiltonian_cycle.push_back( point_j );
+            }
+            else
+            {
+                if( !is_in( hamiltonian_cycle, point_i ) )
+                {
+                    hamiltonian_cycle.push_back( point_i );
+                } 
+
+                if( !is_in( hamiltonian_cycle, lower_point ))
+                {
+                    hamiltonian_cycle.push_back( lower_point );
+                } 
+
+                if( !is_in( hamiltonian_cycle, point_j ))
+                {
+                    hamiltonian_cycle.push_back( point_j );
+                }
+            }            
         }
-        else
+
+        // --- updanting convex_hull --- //
+        convex_hull.clear();
+
+        for( int j = 0 ; j <= hamiltonian_cycle.size() ; j++ )
         {
-            return;
+            convex_hull.push_back( make_pair( hamiltonian_cycle[j].first, hamiltonian_cycle[j].second ) );
         }
+        // --- --- //
     }
 }
 
-void get_hamiltonian(vector<pair<int,int>> points, vector<int> &hamiltonian, set<pair<int,int>> convex_hull ) {
-
-    vector<int>ec1;
-    vector<int>ec2;
-
-    set<pair<int ,int>> :: iterator it;
-    set<pair<int ,int>> :: iterator end;
-    vector<pair<int,int>>::iterator it2;
-
-    pair<int,int> pa = make_pair(convex_hull.begin()->first,convex_hull.begin()->second);
-    pair<int,int> pb;
-    for (it = convex_hull.begin() ; it != convex_hull.end() ; it++ ) { 
-        pb = make_pair(it->first,it->second);
-        end = it;
-    }
-
-    it2 = std::find (points.begin(), points.end(), pa);
-    int pa_index = std::distance(points.begin(),it2) +1;
-    
-    it2 = std::find (points.begin(), points.end(), pb);
-    int pb_index = std::distance(points.begin(),it2 ) +1;
-    // cout<<"pa ("<<pa.first<<","<<pa.second<<") com indice "<<pa_index<<endl;
-    // cout<<"pb ("<<pb.first<<","<<pb.second<<") com indice "<<pb_index<<endl;
-
-    convex_hull.erase(convex_hull.begin());
-    convex_hull.erase(end);
-
-    for (it = convex_hull.begin() ; it != convex_hull.end() ; it++ ) {
-
-        pair<int,int> point = make_pair(it->first,it->second);
-        it2 = std::find (points.begin(), points.end(), point);
-        int index = std::distance(points.begin(),it2)+1;
-        // cout<<index<<endl;
-        int side = get_side(pa,pb,point);
-        // cout<<"point ("<<point.first<<","<<point.second<<") com indice "<<index<<endl;
-        if(side == 1){ ec1.push_back(index); }
-        else if (side == -1 ){ ec2.push_back(index); }
-    }
-    
-    hamiltonian.push_back(pa_index);
-    for(int i=0; i<ec1.size(); i++){
-        hamiltonian.push_back(ec1[i]);
-    }
-    hamiltonian.push_back(pb_index);
-    for(int i=ec2.size()-1; i>=0; i--){
-        hamiltonian.push_back(ec2[i]);
-    }
-    hamiltonian.push_back(pa_index);
-
-}
 
 int main(int argc, char **argv )
 {
+    // --- Instantiating variables --- //
     chrono::time_point<chrono::high_resolution_clock> start, stop;
     ifstream convex_hull_data;
     ifstream points_data;
-    set< pair<int, int> >::iterator it;
+    vector< pair<int, int> >::iterator it;
 
     int convex_hull_size;
-    set< pair<int, int> > convex_hull;
-    vector<int> aux;
+    vector< pair<int, int> > convex_hull;
+    vector<int> aux; 
 
     int points_size;
     set< pair<int, int> > points;
     vector<pair<int,int>> points_index; //saves all points to get they index later
 
     vector<int> hamiltonian;
+    // --- --- //
 
     convex_hull_data.open( argv[1] );
     points_data.open( argv[2] );
-
 
     if( !convex_hull_data || !points_data ) 
     { 
@@ -181,7 +150,7 @@ int main(int argc, char **argv )
     }
 
     for( int i=0; i<aux.size(); i=i+2 ) {
-        convex_hull.insert( make_pair( aux[i],aux[i+1] ) );
+        convex_hull.push_back( make_pair( aux[i],aux[i+1] ) );
     }
     // --- --- //
 
@@ -195,10 +164,9 @@ int main(int argc, char **argv )
         points_data >> value;
         aux.push_back( value );
     }
-
     for( int i=0; i<aux.size(); i=i+2 ) {
-        it = convex_hull.find( make_pair( aux[i],aux[i+1] ) );
-        if( it == convex_hull.end() ) // if there is not in convex_hull
+        pair<int,int> elem = make_pair( aux[i],aux[i+1] );
+        if( find(convex_hull.begin(), convex_hull.end(), elem ) == convex_hull.end()) // if there is not in convex_hull
         {
             points.insert( make_pair( aux[i],aux[i+1] ) );
         }
@@ -206,33 +174,57 @@ int main(int argc, char **argv )
     }
     // --- --- //    
 
-    
-    cout << "Hamiltonian cicle before insertions" << endl;
-    for (it = convex_hull.begin() ; it != convex_hull.end() ; it++ ) {
-            cout<<"("<<it->first<<","<<it->second<<") \n";
-    }
 
     start = chrono::high_resolution_clock::now();
 
+    // --- Calling function that finds hamiltonian cycle --- //
     insert_points( convex_hull, points );
+    // --- --- //
 
     stop = chrono::high_resolution_clock::now();
     double duration =chrono::duration<double, ratio<1, 1000>>(stop-start).count();
-    cout<< "\nInsertions Duration: " << duration << "ms \n";
 
+    
 
+    // --- Creating output file with generated edges --- //
+    string fileName("saida3.txt");
+    ofstream file_out;
 
-    cout << "\nAfter insertions" << endl;
-    for (it = convex_hull.begin() ; it != convex_hull.end() ; it++ ) {
-            cout<<"("<<it->first<<","<<it->second<<") \n";
+    file_out.open(fileName);
+    if( !file_out )
+    {
+      cout << "Error: file could not be opened" << endl;
+      exit(1);
     }
 
-    get_hamiltonian( points_index, hamiltonian, convex_hull );
-    cout<<"\nHamiltonian cicle : \n";
-    for(int i=0; i<hamiltonian.size(); i++){
-        cout<<hamiltonian[i]<<" ";
+    vector< pair<int, int>> auxiliar;
+
+    convex_hull[convex_hull.size()-1] = convex_hull[0]; 
+    for (int i = 0; i < convex_hull.size() ; i++ ) {
+            file_out << convex_hull[i].first << " " << convex_hull[i].second << "\n";
+            /*distance_between_points(  )
+            auxiliar.push_back( make_pair( convex_hull[j].first, convex_hull[j].second ) );*/
     }
+    
+    file_out.close();
+    // --- --- //
+    
+
+    // --- Distance --- //
+    double hamiltonian_distance = 0;
+
+    for (int i = 0; i < convex_hull.size() - 1 ; i++ )
+    {
+        hamiltonian_distance += distance_between_points( make_pair( convex_hull[i].first, convex_hull[i].second ),
+                                                 make_pair( convex_hull[i+1].first, convex_hull[i+1].second ) );
+    }
+    // --- --- //
+
+    // --- Output program --- //
+    cout << "\nTotal Hamiltonian Distance: " << hamiltonian_distance << "\n";
+    cout << "Insertions Duration: " << duration << "ms \n";
     cout<<endl;
+    // --- --- //
 
     return 0;
 }
