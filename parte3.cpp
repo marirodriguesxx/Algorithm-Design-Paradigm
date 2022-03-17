@@ -201,9 +201,7 @@ int main(int argc, char **argv )
 
     convex_hull[convex_hull.size()-1] = convex_hull[0]; 
     for (int i = 0; i < convex_hull.size() ; i++ ) {
-            file_out << convex_hull[i].first << " " << convex_hull[i].second << "\n";
-            /*distance_between_points(  )
-            auxiliar.push_back( make_pair( convex_hull[j].first, convex_hull[j].second ) );*/
+        file_out << convex_hull[i].first << " " << convex_hull[i].second << "\n";
     }
     
     file_out.close();
